@@ -1,0 +1,54 @@
+<x-modal-overflow-visible wire:model="showSearchAddItem" size="lg">
+    @if ($showSearchAddItem)
+        <x-slot name="modalHeader">
+            <div>
+                <h1 class="text-2xl font-semibold">Add Item</h1>
+            </div>
+        </x-slot>
+
+        <form wire:submit.prevent="create" class="grid gap-y-6 gap-x-4 grid-cols-7">
+
+            {{-- <x-form-select-comp class="col-span-2" wire:model="item_id" :options="$items" optionValue="id"
+                                isDisabled="{{ false }}"
+                                optionDisplay="item_name" label="Select an Item*" for="item_id" /> --}}
+
+            <x-combobox class="col-span-2" wire:model="itemSearch" for="items" label="Select an Item">
+                @foreach ($items as $item)
+                    <li wire:key="{{ $item->id }}"
+                        @click="$wire.setItem({{ $item->id }}, '{{ $item->item_name }}').then(show = false)"
+                        class="relative cursor-default hover:text-white hover:bg-primary select-none py-2 pl-3 pr-9 text-gray-900"
+                        role="item" tabindex="-1">
+                        <span class="block truncate">{{ $item->item_name }}</span>
+                    </li>
+                @endforeach
+            </x-combobox>
+
+            <x-form-input-comp class="col-span-1" wire:model.defer="invoice_unit" label="Invoice Unit*"
+                               for="invoice_unit"
+                               type="text" />
+
+            <x-form-input-comp class="col-span-1" wire:model.defer="price" label="Price*"
+                               for="price"
+                               type="text" />
+
+            <x-form-input-comp class="col-span-1" wire:model.defer="qty" label="Qty*"
+                               for="qty"
+                               type="text" />
+
+            <x-form-disabled-comp class="col-span-1" wire:model.defer="recipe_unit" label="Recipe Unit"
+                                  for="recipe_unit"
+                                  type="text" />
+            <x-form-input-comp class="col-span-1" wire:model.defer="recipe_qty" label="Recipe Qty*"
+                               for="recipe_qty"
+                               type="text" />
+        </form>
+
+
+        <x-slot name="modalAction">
+            <button wire:click="addToCallersList" type="button"
+                    class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                Add Item
+            </button>
+        </x-slot>
+    @endisset
+    </x-modal>
