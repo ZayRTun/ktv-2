@@ -60,7 +60,8 @@ class LiveInhouseEdit extends Component
     // States
     public $showInhouseEditForm = false;
     public $sessionsPassed;
-    public $remainingTime;
+    public $inHouseSessions;
+    public $inHouseTime;
     public $remainingSessions;
     public $decimals = 0;
     public $isDirty = false;
@@ -119,6 +120,8 @@ class LiveInhouseEdit extends Component
 
     public function checkOut()
     {
+        dd(now()->diffInMinutes($this->arrival));
+
         $this->inhouse->update([
             'checked_out' => true
         ]);
@@ -493,8 +496,10 @@ class LiveInhouseEdit extends Component
         $this->arrivalDate = Carbon::parse($this->arrival)->format('Y-m-d');
         $this->arrivalTime = Carbon::parse($this->arrival)->format('H:i');
 
-        $this->departureDate = Carbon::parse($this->departure)->format('Y-m-d');
-        $this->departureTime = Carbon::parse($this->departure)->format('H:i');
+        if ($this->departure) {
+            $this->departureDate = Carbon::parse($this->departure)->format('Y-m-d');
+            $this->departureTime = Carbon::parse($this->departure)->format('H:i');
+        }
 
         $this->inhouse->updated_user_id = auth()->id();
 
@@ -508,13 +513,23 @@ class LiveInhouseEdit extends Component
 
     protected function setUpDisplayRemainder()
     {
-        if (now()->diffInMinutes($this->inhouse->departure, false) > 60) {
-            $this->remainingTime = now()->diff($this->inhouse->departure)->format('%hhrs %imins');
-        } elseif (now()->diffInMinutes($this->inhouse->departure, false) <= 0) {
-            $this->remainingTime = "Time's Up";
+        $inSessionMinutes = now()->diffInMinutes($this->inhouse->arrival);
+        $inSessionTime = now()->diff($this->inhouse->arrival);
+
+        if ($inSessionMinutes > 60) {
+            $this->inHouseSessions = ceil(($inSessionMinutes / 60) / 0.5) * 0.5;
+            $this->inHouseTime = $inSessionTime->format('%hhrs %imins');
         } else {
-            $this->remainingTime = now()->diff($this->inhouse->departure)->format('%imins');
+            $this->inHouseSessions = 1;
+            $this->inHouseTime = $inSessionTime->format('%imins');
         }
+        // if (now()->diffInMinutes($this->inhouse->departure, false) > 60) {
+        //     $this->remainingTime = now()->diff($this->inhouse->departure)->format('%hhrs %imins');
+        // } elseif (now()->diffInMinutes($this->inhouse->departure, false) <= 0) {
+        //     $this->remainingTime = "Time's Up";
+        // } else {
+        //     $this->remainingTime = now()->diff($this->inhouse->departure)->format('%imins');
+        // }
     }
 
     public function setFirstResult()

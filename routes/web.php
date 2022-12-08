@@ -9,7 +9,6 @@ use App\Http\Livewire\LiveExpenseSummaryReport;
 use App\Http\Livewire\LiveFbMenuView;
 use App\Http\Livewire\LiveItemIndex;
 use App\Http\Livewire\LiveProfitSummaryReport;
-use App\Http\Livewire\LivePurchaseCreate;
 use App\Http\Livewire\LivePurchaseDetailReport;
 use App\Http\Livewire\LivePurchaseIndex;
 use App\Http\Livewire\LivePurchaseSummaryReport;
@@ -25,10 +24,6 @@ use App\Http\Livewire\LiveSupplierIndex;
 use App\Http\Livewire\LiveUserPasswordChange;
 use App\Http\Livewire\LiveUserRolesAndPermissionView;
 use App\Http\Livewire\LiveUserView;
-use App\Models\Expense;
-use App\Models\Inhouse;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -51,8 +46,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/stockout', LiveStockOutIndex::class)->name('stockout.index')->middleware('permission:view stockouts');
 
     Route::group(['middleware' => ['permission:view reports']], function () {
-        // Route::get('/dashboard', LiveDashboard::class)->name('report.dashboard');
-        // Route::get('/reports', LiveSalesDetailReport::class)->name('report.sales-detail');
         Route::get('/reports', LiveDashboard::class)->name('report.dashboard');
         Route::get('/reports/sales-details', LiveSalesDetailReport::class)->name('report.sales-detail');
         Route::get('/reports/sales-summary', LiveSalesSummaryReport::class)->name('report.sales-summary');
