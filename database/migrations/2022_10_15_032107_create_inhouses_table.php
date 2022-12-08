@@ -17,8 +17,8 @@ return new class () extends Migration {
             $table->foreignId('room_id')->constrained()->restrictOnDelete();
             $table->float('room_rate')->default(0.00);
             $table->dateTime('arrival');
-            $table->dateTime('departure');
-            $table->float('session_hours');
+            $table->dateTime('departure')->nullable();
+            $table->float('session_hours')->nullable();
             $table->boolean('checkout_payment_done')->default(false);
             $table->boolean('checked_out')->default(false);
             $table->string('customer_id')->nullable();

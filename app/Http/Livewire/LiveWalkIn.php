@@ -54,8 +54,8 @@ class LiveWalkIn extends Component
         'inhouse.room_id' => 'required|integer',
         'inhouse.room_rate' => 'required|between:0,999999999.99',
         'inhouse.arrival' => 'required|date',
-        'inhouse.departure' => 'required|date',
-        'inhouse.session_hours' => 'required|between:0,99.99',
+        'inhouse.departure' => 'nullable|date',
+        'inhouse.session_hours' => 'nullable|between:0,99.99',
         'inhouse.customer_id' => 'nullable|integer',
         'inhouse.operation_date' => 'required|date',
         'inhouse.created_user_id' => 'required|integer',
@@ -64,7 +64,10 @@ class LiveWalkIn extends Component
     public function checkIn()
     {
         $this->inhouse->arrival = $this->arrivalDate.' '.$this->arrivalTime;
-        $this->inhouse->departure = $this->departureDate.' '.$this->departureTime;
+
+        if ($this->departureDate && $this->departureTime) {
+            $this->inhouse->departure = $this->departureDate.' '.$this->departureTime;
+        }
 
         $this->validate();
 
@@ -255,16 +258,16 @@ class LiveWalkIn extends Component
 
         $this->inhouse->room_id = $room->id;
         $this->inhouse->room_rate = $room->type->room_rate;
-        $this->inhouse->session_hours = 1;
+        // $this->inhouse->session_hours = 1;
         $this->inhouse->operation_date = app('OperationDate');
         // Datetime for formatted for Flatpickr
         $this->arrival = now();
-        $this->departure = now()->addHour();
+        // $this->departure = now()->addHour();
         $this->arrivalDate = $this->arrival->format('Y-m-d');
         $this->arrivalTime = $this->arrival->format('H:i');
 
-        $this->departureDate = $this->departure->format('Y-m-d');
-        $this->departureTime = $this->departure->format('H:i');
+        // $this->departureDate = $this->departure->format('Y-m-d');
+        // $this->departureTime = $this->departure->format('H:i');
 
         $this->inhouse->created_user_id = auth()->id();
 

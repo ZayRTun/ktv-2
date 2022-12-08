@@ -3,7 +3,8 @@
         <x-slot name="modalHeader">
             <div class="flex space-x-3 items-baseline">
                 <h1 class="text-2xl font-semibold">Edit Inhouse</h1>
-                <span>Remains: <span class="font-semibold text-xl">{{ $remainingTime }}</span></span>
+                <span>Time: <span class="font-semibold text-xl">{{ $inHouseTime }}</span></span>
+                <span>Sessions: <span class="font-semibold text-xl">{{ $inHouseSessions }}</span></span>
                 {{-- <span>IH: {{ $inhouse->id }}</span>
                 @isset($inhouse->order)
                     <span>Or: {{ $inhouse->order->id }}</span>
@@ -325,8 +326,12 @@
         </x-slot>
 
         <x-slot name="modalAction">
-            <button type="button" wire:click="checkOut"
+            {{-- <button type="button" wire:click="checkOut"
                     {{ $isPaid ? '' : 'disabled' }}
+                    class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md disabled:bg-gray-300 disabled:text-gray-500 enabled:text-white enabled:bg-primary enabled:hover:bg-blue-900 focus:outline-none">
+                Check Out
+            </button> --}}
+            <button type="button" wire:click="checkOut"
                     class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md disabled:bg-gray-300 disabled:text-gray-500 enabled:text-white enabled:bg-primary enabled:hover:bg-blue-900 focus:outline-none">
                 Check Out
             </button>
