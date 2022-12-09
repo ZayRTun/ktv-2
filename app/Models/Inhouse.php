@@ -53,6 +53,11 @@ class Inhouse extends Model
         return $this->hasMany(ViewInformationInvoice::class);
     }
 
+    public function viewInformationInvoiceCustomers()
+    {
+        return $this->hasMany(ViewInformationInvoiceCustomer::class);
+    }
+
     public function carbonArrival(): Attribute
     {
         return Attribute::make(

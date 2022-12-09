@@ -17,9 +17,9 @@ return new class () extends Migration {
             $table->foreignId('inhouse_id')->constrained()->restrictOnDelete();
             $table->foreignId('service_staff_id')->constrained('service_staff')->restrictOnDelete();
             $table->dateTime('checkin_time');
-            $table->dateTime('checkout_time');
+            $table->dateTime('checkout_time')->nullable();
             $table->boolean('is_checked_out')->default(false);
-            $table->float('session_hours');
+            $table->float('session_hours')->nullable();
             $table->float('service_staff_rate');
             $table->float('service_staff_commission_rate');
             $table->date('operation_date');

@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class InhouseService extends Model
 {
@@ -24,5 +26,12 @@ class InhouseService extends Model
     public function serviceStaff()
     {
         return $this->belongsTo(ServiceStaff::class);
+    }
+
+    public function carbonCheckin(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => Carbon::parse($this->checkin_time)
+        );
     }
 }

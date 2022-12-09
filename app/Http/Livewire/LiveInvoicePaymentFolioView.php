@@ -99,11 +99,10 @@ class LiveInvoicePaymentFolioView extends Component
 
     public function viewInvoicePaymentFolio(Inhouse $inhouse)
     {
-        // $this->inhouse = $inhouse;
         $this->fill($inhouse);
         $this->room_no = $inhouse->room->room_no;
         $this->inhouse_id = $inhouse->id;
-        $this->payments = $inhouse->viewInformationInvoices;
+        $this->payments = $inhouse->viewInformationInvoiceCustomers;
         $this->sub_total = $this->payments->sum('amount');
         $this->calculateAmounts();
         $this->initialInhouseUpdate();
@@ -116,7 +115,7 @@ class LiveInvoicePaymentFolioView extends Component
     {
         if (isset($this->inhouse_id)) {
             $inhouse = Inhouse::find($this->inhouse_id);
-            $this->payments = $inhouse->viewInformationInvoices;
+            $this->payments = $inhouse->viewInformationInvoiceCustomers;
         }
     }
 

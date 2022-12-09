@@ -15,6 +15,8 @@ class LiveInhouseEdit extends Component
 {
     use AuthorizesRequests;
 
+    public $isOpenSession = false;
+
     public $counter;
     public $room;
     public $inhouseId;
@@ -58,6 +60,7 @@ class LiveInhouseEdit extends Component
     public $orderDetails;
 
     // States
+    public $remainingTime;
     public $showInhouseEditForm = false;
     public $sessionsPassed;
     public $inHouseSessions;
@@ -105,7 +108,7 @@ class LiveInhouseEdit extends Component
                 'nick_name' => $service->serviceStaff->nick_name,
                 'arrival' => $service->checkin_time->format('Y-m-d g:i A'),
                 'is_checked_out' => $service->is_checked_out,
-                'departure' => $service->checkout_time->format('Y-m-d g:i A'),
+                'departure' => $service->checkout_time ? $service->checkout_time->format('Y-m-d g:i A') : null,
                 'sessions' => $service->session_hours,
                 'service_staff_rate' => $service->service_staff_rate,
                 'service_staff_commission_rate' => $service->service_staff_commission_rate,
@@ -120,7 +123,9 @@ class LiveInhouseEdit extends Component
 
     public function checkOut()
     {
-        dd(now()->diffInMinutes($this->arrival));
+        if (! $this->isPaid) {
+            return;
+        }
 
         $this->inhouse->update([
             'checked_out' => true
@@ -129,7 +134,6 @@ class LiveInhouseEdit extends Component
         foreach ($this->inhouse->inhouseServices as $service) {
             $service->update(['is_checked_out' => true]);
         }
-
 
         $this->emit('roomCheckedOut');
         $this->showInhouseEditForm = false;
@@ -465,6 +469,11 @@ class LiveInhouseEdit extends Component
         $this->customerSearch = $inhouse->customer?->customer_name;
 
         $this->inhouse = $inhouse->load('room.type');
+
+        if (!$inhouse->departure) {
+            $this->setSessionAndDeparture();
+        }
+
         $this->isPaid = $inhouse->checkout_payment_done;
         $this->incomeTransactions = $this->inhouse->incomeTransactions;
 
@@ -477,7 +486,7 @@ class LiveInhouseEdit extends Component
                 'inhouse_service_id' => $service->id,
                 'nick_name' => $service->serviceStaff->nick_name,
                 'arrival' => $service->checkin_time->format('Y-m-d g:i A'),
-                'departure' => $service->checkout_time->format('Y-m-d g:i A'),
+                'departure' => $service->checkout_time ? $service->checkout_time->format('Y-m-d g:i A') : null,
                 'is_checked_out' => $service->is_checked_out,
                 'sessions' => $service->session_hours,
                 'service_staff_rate' => $service->service_staff_rate,
@@ -487,7 +496,6 @@ class LiveInhouseEdit extends Component
 
         $this->room = $this->inhouse->room;
 
-        $this->setUpDisplayRemainder();
         $this->sessionsPassed = round(now()->diffInMinutes($this->inhouse->arrival) / 60, 1);
         $this->remainingSessions = $this->inhouse->session_hours - $this->sessionsPassed;
         $this->arrival = $this->inhouse->arrival;
@@ -496,10 +504,18 @@ class LiveInhouseEdit extends Component
         $this->arrivalDate = Carbon::parse($this->arrival)->format('Y-m-d');
         $this->arrivalTime = Carbon::parse($this->arrival)->format('H:i');
 
-        if ($this->departure) {
-            $this->departureDate = Carbon::parse($this->departure)->format('Y-m-d');
-            $this->departureTime = Carbon::parse($this->departure)->format('H:i');
-        }
+        // if ($this->departure) {
+        //     $this->isOpenSession = false;
+        $this->departureDate = Carbon::parse($this->departure)->format('Y-m-d');
+        $this->departureTime = Carbon::parse($this->departure)->format('H:i');
+        $this->setUpDisplayRemainder();
+        // } else {
+        //     $this->isOpenSession = true;
+        //     $this->setSessionAndDeparture();
+        //     $this->departureDate = Carbon::parse($this->departure)->format('Y-m-d');
+        //     $this->departureTime = Carbon::parse($this->departure)->format('H:i');
+        //     $this->setUpDisplayRemainder();
+        // }
 
         $this->inhouse->updated_user_id = auth()->id();
 
@@ -513,16 +529,6 @@ class LiveInhouseEdit extends Component
 
     protected function setUpDisplayRemainder()
     {
-        $inSessionMinutes = now()->diffInMinutes($this->inhouse->arrival);
-        $inSessionTime = now()->diff($this->inhouse->arrival);
-
-        if ($inSessionMinutes > 60) {
-            $this->inHouseSessions = ceil(($inSessionMinutes / 60) / 0.5) * 0.5;
-            $this->inHouseTime = $inSessionTime->format('%hhrs %imins');
-        } else {
-            $this->inHouseSessions = 1;
-            $this->inHouseTime = $inSessionTime->format('%imins');
-        }
         // if (now()->diffInMinutes($this->inhouse->departure, false) > 60) {
         //     $this->remainingTime = now()->diff($this->inhouse->departure)->format('%hhrs %imins');
         // } elseif (now()->diffInMinutes($this->inhouse->departure, false) <= 0) {
@@ -530,6 +536,34 @@ class LiveInhouseEdit extends Component
         // } else {
         //     $this->remainingTime = now()->diff($this->inhouse->departure)->format('%imins');
         // }
+        // if ($this->isOpenSession) {
+        $inSessionAndTime = $this->getInhouseSessionAndTime();
+        $this->inHouseSessions = $inSessionAndTime['inHouseSessions'];
+        $this->inHouseTime = $inSessionAndTime['inHouseTime'];
+        // } else {
+        //     if (now()->diffInMinutes($this->inhouse->departure, false) > 60) {
+        //         $this->remainingTime = now()->diff($this->inhouse->departure)->format('%hhrs %imins');
+        //     } elseif (now()->diffInMinutes($this->inhouse->departure, false) <= 0) {
+        //         $this->remainingTime = "Time's Up";
+        //     } else {
+        //         $this->remainingTime = now()->diff($this->inhouse->departure)->format('%imins');
+        //     }
+        // }
+    }
+
+    protected function getInhouseSessionAndTime()
+    {
+        $sessionAndTime = [];
+        $inSessionMinutes = now()->diffInMinutes($this->inhouse->arrival);
+        $inSessionTime = now()->diff($this->inhouse->arrival);
+        if ($inSessionMinutes > 60) {
+            $sessionAndTime['inHouseSessions'] = ceil(($inSessionMinutes / 60) / 0.5) * 0.5;
+            $sessionAndTime['inHouseTime'] = $inSessionTime->format('%hhrs %imins');
+        } else {
+            $sessionAndTime['inHouseSessions'] = 1;
+            $sessionAndTime['inHouseTime'] = $inSessionTime->format('%imins');
+        }
+        return $sessionAndTime;
     }
 
     public function setFirstResult()
@@ -557,5 +591,36 @@ class LiveInhouseEdit extends Component
         ->get();
 
         return view('livewire.live-inhouse-edit');
+    }
+
+    protected function setSessionAndDeparture()
+    {
+        $g = $this->getInhouseSessionAndTime();
+        $this->inhouse->update([
+            'session_hours' => $g['inHouseSessions'],
+            'departure' => $this->inhouse->carbonArrival->addMinutes($g['inHouseSessions'] * 60),
+        ]);
+
+        $inhouseServices = $this->inhouse->inhouseServices()->where('is_checked_out', false)->get();
+
+        foreach ($inhouseServices as $inhouseService) {
+            $sessions = $this->getSessions($inhouseService->checkin_time);
+            $inhouseService->update([
+                'checkout_time' => $inhouseService->carbonCheckin->addMinutes($sessions * 60),
+                'session_hours' => $sessions
+            ]);
+        }
+
+        $this->inhouse->refresh();
+    }
+
+    protected function getSessions($arrival)
+    {
+        $inSessionMinutes = now()->diffInMinutes($arrival);
+        if ($inSessionMinutes > 60) {
+            return ceil(($inSessionMinutes / 60) / 0.5) * 0.5;
+        } else {
+            return 1;
+        }
     }
 }

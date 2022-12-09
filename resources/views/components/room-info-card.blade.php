@@ -26,6 +26,13 @@
 
         <div @class([
             'px-4 flex flex-col text-primary flex-1',
+            // Vacant
+            'bg-vacant' => !$room->checkout_payment_status && $room->status == 0,
+            // Occupy open session or fixed session
+            'bg-occupy' =>
+                !$room->checkout_payment_status &&
+                ($room->status === 3 || $room->status === 2),
+        
             'bg-arrival' => $room->checkout_payment_status,
             'bg-departure' =>
                 !$room->checkout_payment_status &&
@@ -33,12 +40,10 @@
             'bg-red-400' =>
                 !$room->checkout_payment_status &&
                 ($room->status == 1 && $room->remaining < 1),
-            'bg-occupy' => !$room->checkout_payment_status && $room->status == 2,
-            'bg-vacant' => !$room->checkout_payment_status && $room->status == 0,
         ]) class="">
             <div class="py-3">
                 <p class="font-medium text-lg">{{ "Room: $room->room_no" }}</p>
-                @if ($room->status != 0)
+                @if ($room->status != 0 && $room->status != 3)
                     <p class="font-semibold text-sm">Sessions: {{ number_format($room->total_minute / 60, 1) }}</p>
                 @endif
             </div>
@@ -49,6 +54,10 @@
                     @break
 
                     @case(2)
+                        <h1>Occupy</h1>
+                    @break
+
+                    @case(3)
                         <h1>Occupy</h1>
                     @break
 

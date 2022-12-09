@@ -39,7 +39,7 @@ class LiveRoomInfo extends Component
     {
         $this->loadStatusCounts();
         $roomTypes = implode(', ', count($this->typesIdForCheckbox) > 0 ? $this->typesIdForCheckbox : [0]);
-        $roomStatuses = implode(', ', count($this->roomStatuses) > 0 ? $this->roomStatuses : [0]);
+        $roomStatuses = implode(', ', count($this->roomStatuses) > 0 ? $this->roomStatuses : [0]) . ', '. 3;
 
         $results = DB::select(
             "SELECT * FROM (
@@ -69,10 +69,18 @@ class LiveRoomInfo extends Component
 				  room_id,
 				  customer_name,
 				  checkout_payment_done as checkout_payment_status,
-				  CASE
-					WHEN time_to_sec(TIMEDIFF(departure, now())) / 60 < 15 THEN 1
-					ELSE 2
-				  END AS 'status',
+				  case when departure is not null
+					then
+						CASE
+							WHEN time_to_sec(TIMEDIFF(departure, now())) / 60 < 15 THEN 1
+							ELSE 2
+						END
+					else 3
+					END AS 'status',
+				--   CASE
+				-- 	WHEN time_to_sec(TIMEDIFF(departure, now())) / 60 < 15 THEN 1
+				-- 	ELSE 2
+				--   END AS 'status',
 				  round(time_to_sec(TIMEDIFF(departure, arrival)) / 60) 'total_minute',
 				round(time_to_sec(TIMEDIFF(departure, now())) / 60) 'remaining'
 				FROM
