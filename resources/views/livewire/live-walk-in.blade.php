@@ -15,12 +15,6 @@
                 <div class="space-y-8 sm:space-y-5">
                     <div class="space-y-6 sm:space-y-1">
                         <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-8">
-                            {{-- <x-form-select-comp class="col-span-4" wire:model="inhouse.customer_id" :options="$customers" optionValue="id"
-                                                optionDisplay="customer_name" label="Customer" for="inhouse.customer_id" /> --}}
-
-
-
-
 
                             <x-combobox class="col-span-4" wire:model="customerSearch" for="customers" label="Customers">
                                 @foreach ($customers as $customer)
@@ -32,9 +26,6 @@
                                     </li>
                                 @endforeach
                             </x-combobox>
-
-
-
 
                             <x-form-disabled-comp class="col-span-2"
                                                   wire:model="inhouse.room_rate" label="Room Rate*"
@@ -88,9 +79,6 @@
                                                          :isDisabled="true"
                                                          label="Checkout Time"
                                                          for="inhouse.departure" />
-
-
-
 
                             <div class="col-span-8">
                                 <div class="h-60 border overflow-y-scroll relative rounded-md shadow-md">

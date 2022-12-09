@@ -80,7 +80,7 @@ class LiveWalkIn extends Component
                 $this->inhouse->inhouseServices()->create([
                     'service_staff_id' => $staff['id'],
                     'checkin_time' => Carbon::parse($staff['arrival']),
-                    'checkout_time' => Carbon::parse($staff['departure']),
+                    'checkout_time' => $staff['departure'] ? Carbon::parse($staff['departure']) : null,
                     'session_hours' => $staff['sessions'],
                     'service_staff_rate' => $staff['service_staff_rate'],
                     'service_staff_commission_rate' => $staff['service_staff_commission_rate'],
@@ -97,10 +97,6 @@ class LiveWalkIn extends Component
     public function updatedEditingStaffArrivalTime($val)
     {
         $this->editingStaffSessionHours = round(Carbon::parse($this->editingStaffArrivalTime)->diffInMinutes($this->editingStaffDepartureTime) / 60, 1);
-        // if ($val > Carbon::parse($this->arrivalTime)->addMinutes(30)) {
-        // } else {
-        //     $this->editingStaffArrivalTime = Carbon::parse($this->arrivalTime)->format("H:i");
-        // }
     }
 
     public function updateStaffTimeChanges()
@@ -195,13 +191,20 @@ class LiveWalkIn extends Component
     public function checkInAddServiceStaffs($staffs)
     {
         $staffs = ServiceStaff::whereIn('id', $staffs)->get();
+
+        $departure = null;
+
+        if ($this->departureDate && $this->departureTime) {
+            $departure = Carbon::parse($this->departureDate.' '.$this->departureTime)->format('Y-m-d g:i A');
+        }
+
         foreach ($staffs as $staff) {
             if (!isset($this->staffs[$staff->id])) {
                 $this->staffs[$staff->id] = [
                     'id' => $staff->id,
                     'nick_name' => $staff->nick_name,
                     'arrival' => Carbon::parse($this->arrivalDate.' '.$this->arrivalTime)->format('Y-m-d g:i A'),
-                    'departure' => Carbon::parse($this->departureDate.' '.$this->departureTime)->format('Y-m-d g:i A'),
+                    'departure' => $departure,
                     'sessions' => $this->inhouse->session_hours,
                     'service_staff_rate' => app('ServiceStaffRates')->service_staff_rate,
                     'service_staff_commission_rate' => app('ServiceStaffRates')->service_staff_commission_rate,
