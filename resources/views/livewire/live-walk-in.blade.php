@@ -37,7 +37,7 @@
                                 <div class="flex-1 flex items-center mt-1 space-x-2">
                                     <span
                                           class="border border-gray-300 flex-1  h-full inline-flex items-center px-2.5 rounded-md shadow-sm sm:text-sm w-full">{{ $inhouse->session_hours }}</span>
-                                    <button {{ $inhouse->session_hours <= 1 ? 'disabled' : '' }} type="button"
+                                    {{-- <button {{ $inhouse->session_hours <= 1 ? 'disabled' : '' }} type="button"
                                             wire:click="changeSessionHours('{{ false }}')"
                                             class="disabled:bg-gray-300 enabled:bg-primary h-full px-2 rounded-md text-white">
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
@@ -52,7 +52,7 @@
                                             <path
                                                   d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
                                         </svg>
-                                    </button>
+                                    </button> --}}
                                 </div>
                             </div>
 

@@ -261,16 +261,16 @@ class LiveWalkIn extends Component
 
         $this->inhouse->room_id = $room->id;
         $this->inhouse->room_rate = $room->type->room_rate;
-        // $this->inhouse->session_hours = 1;
+        $this->inhouse->session_hours = 1;
         $this->inhouse->operation_date = app('OperationDate');
-        // Datetime for formatted for Flatpickr
+        // Datetime formatted for Flatpickr
         $this->arrival = now();
-        // $this->departure = now()->addHour();
+        $this->departure = now()->addHour();
         $this->arrivalDate = $this->arrival->format('Y-m-d');
         $this->arrivalTime = $this->arrival->format('H:i');
 
-        // $this->departureDate = $this->departure->format('Y-m-d');
-        // $this->departureTime = $this->departure->format('H:i');
+        $this->departureDate = $this->departure->format('Y-m-d');
+        $this->departureTime = $this->departure->format('H:i');
 
         $this->inhouse->created_user_id = auth()->id();
 
