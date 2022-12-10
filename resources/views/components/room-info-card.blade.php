@@ -21,44 +21,63 @@
      {{-- @click="showActions = true" --}}
      @click="handleClick('{{ $room->status }}', '{{ $room->status == 0 ? $room->room_id : $room->inhouse_id }}', '{{ auth()->user()->can('add inhouse') }}', '{{ auth()->user()->can('edit inhouse') }}')"
      class="flex-shrink-0 max-w-[190px] relative w-full">
+    @php
+        $timesUp = false;
+        $sessions = null;
+        $timeDisplay = null;
+        if ($room->total_in_minutes > 60) {
+            $sessions = ceil($room->total_in_minutes / 60 / 0.5) * 0.5;
+            // $timeDisplay = \Carbon\Carbon::parse($room->total_time)->format('H:i:s');
+            $timeDisplay = $room->total_time;
+        } else {
+            $sessions = 1;
+            // $timeDisplay = \Carbon\Carbon::parse($room->total_time)->format('%imins');
+            $timeDisplay = $room->total_time;
+        }
+        
+        if ($room->remaining_in_minutes) {
+            $timesUp = $room->remaining_in_minutes <= 0 ? true : false;
+        } else {
+            $timesUp = false;
+        }
+    @endphp
     <div
          class="cursor-pointer border min-h-[190px] max-w-[190px] w-full shadow-md rounded-md overflow-hidden flex flex-col relative">
 
         <div @class([
             'px-4 flex flex-col text-primary flex-1',
             // Vacant
-            'bg-vacant' => !$room->checkout_payment_status && $room->status == 0,
+            'bg-vacant' => $room->status == 0,
+            'bg-occupy' => $room->status == 1,
+            'bg-arrival' => $room->status == 2 && !$timesUp,
+            'bg-red-400' => $room->status == 2 && $timesUp,
             // Occupy open session or fixed session
-            'bg-occupy' =>
-                !$room->checkout_payment_status &&
-                ($room->status === 3 || $room->status === 2),
+            // 'bg-occupy' =>
+            //     !$room->checkout_payment_status &&
+            //     ($room->status === 3 || $room->status === 2),
         
-            'bg-arrival' => $room->checkout_payment_status,
-            'bg-departure' =>
-                !$room->checkout_payment_status &&
-                ($room->status == 1 && $room->remaining > 1),
-            'bg-red-400' =>
-                !$room->checkout_payment_status &&
-                ($room->status == 1 && $room->remaining < 1),
+            // 'bg-arrival' => $room->checkout_payment_status,
+            // 'bg-departure' =>
+            //     !$room->checkout_payment_status &&
+            //     ($room->status == 1 && $room->remaining > 1),
+            // 'bg-red-400' =>
+            //     !$room->checkout_payment_status &&
+            //     ($room->status == 1 && $room->remaining < 1),
         ]) class="">
             <div class="py-3">
                 <p class="font-medium text-lg">{{ "Room: $room->room_no" }}</p>
                 @if ($room->status != 0 && $room->status != 3)
-                    <p class="font-semibold text-sm">Sessions: {{ number_format($room->total_minute / 60, 1) }}</p>
+                    <p class="font-semibold text-sm">Sessions: {{ $sessions }}</p>
                 @endif
             </div>
             <div class="py-3 text-lg font-semibold flex-1 flex items-center">
                 @switch($room->status)
                     @case(1)
-                        <h1>Departure</h1>
+                        <h1>Occupy</h1>
                     @break
 
                     @case(2)
-                        <h1>Occupy</h1>
-                    @break
-
-                    @case(3)
-                        <h1>Occupy</h1>
+                        <h1>Paid</h1>
                     @break
 
                     @default
@@ -71,7 +90,23 @@
                  stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="font-semibold text-sm">{{ $room->remaining < 1 ? 0 : $room->remaining }} Min Left</p>
+
+            @if (!$timesUp)
+                @switch($room->status)
+                    @case(1)
+                        <p class="font-semibold text-sm">{{ $timeDisplay }} Elapsed</p>
+                    @break
+
+                    @case(2)
+                        <p class="font-semibold text-sm">{{ $timeDisplay }} Remains</p>
+                    @break
+
+                    @default
+                        <p class="font-semibold text-sm">--:--</p>
+                @endswitch
+            @else
+                <p class="font-semibold text-sm">00:00 Times Up!</p>
+            @endif
         </footer>
     </div>
 

@@ -125,7 +125,7 @@
 
 
     @isset($rooms)
-        <div wire:poll.3000ms>
+        <div wire:poll.3000ms="updateRoomTimers">
             @if ($viewBy == 'all')
                 <section class="mb-16">
                     <header>

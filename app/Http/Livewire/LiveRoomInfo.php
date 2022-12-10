@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Inhouse;
 use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,15 @@ class LiveRoomInfo extends Component
         'roomCheckedOut' => '$refresh',
     ];
 
+    public function updateRoomTimers()
+    {
+        $inhouses = Inhouse::where('checkout_payment_done', false)->get();
+
+        foreach ($inhouses as $key => $value) {
+            # code...
+        }
+    }
+
     public function mount()
     {
         $this->dateToday = today()->toDateString();
@@ -51,11 +61,9 @@ class LiveRoomInfo extends Component
 			x.customer_name,
 			x.checkout_payment_status,
 			room_type_name,
-			x.total_minute,
-			CASE
-				WHEN remaining IS NULL THEN 0
-				ELSE remaining
-			END remaining,
+			x.total_time,
+			x.remaining_in_minutes,
+			x.total_in_minutes,
 			CASE
 			  WHEN status IS NULL THEN 0
 			  ELSE status
@@ -69,23 +77,22 @@ class LiveRoomInfo extends Component
 				  room_id,
 				  customer_name,
 				  checkout_payment_done as checkout_payment_status,
-				  case when departure is not null
-					then
-						CASE
-							WHEN time_to_sec(TIMEDIFF(departure, now())) / 60 < 15 THEN 1
-							ELSE 2
-						END
-					else 3
-					END AS 'status',
-				--   CASE
-				-- 	WHEN time_to_sec(TIMEDIFF(departure, now())) / 60 < 15 THEN 1
-				-- 	ELSE 2
-				--   END AS 'status',
-				  round(time_to_sec(TIMEDIFF(departure, arrival)) / 60) 'total_minute',
-				round(time_to_sec(TIMEDIFF(departure, now())) / 60) 'remaining'
+				  CASE
+					WHEN checkout_payment_done = true THEN 2
+					ELSE 1
+				END as 'status',
+				  CASE
+						WHEN checkout_payment_done = true then TIME_FORMAT(TIMEDIFF(departure, now()), '%H:%i')
+						ELSE TIME_FORMAT(TIMEDIFF(now(), arrival), '%H:%i')
+					END as 'total_time',
+					CASE
+						WHEN checkout_payment_done = true then round(time_to_sec(TIMEDIFF(departure, now())) / 60)
+						ELSE null
+					END as 'remaining_in_minutes',
+					round(time_to_sec(TIMEDIFF(now(), arrival)) / 60) 'total_in_minutes'
 				FROM
 				  inhouses
-				  LEFT JOIN customers on customers.id = inhouses.id
+				  LEFT JOIN customers on customers.id = inhouses.customer_id
 				WHERE
 				  checked_out = 0
 			  ) x ON r.id = x.room_id
