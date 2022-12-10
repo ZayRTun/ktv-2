@@ -5,27 +5,13 @@
 
 
     <x-content-header-section>
-        {{-- <div class="flex items-center space-x-8"> --}}
-        {{-- <div class="flex items-center space-x-3">
-                <x-datepicker-inline-label label="From" wire:model="fromDate" />
-                <x-datepicker-inline-label label="To" wire:model="toDate" />
-            </div> --}}
-        {{-- </div> --}}
-
         <div class="sm:flex-none">
-            {{-- @can('create', App\Models\Expense::class) --}}
-            <button wire:click="$emit('createExpenseType')" type="button"
-                    class="inline-flex items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto">
-                Add Expense Type
-            </button>
-            {{-- @endcan --}}
-
-            {{-- @can('viewAny', App\Models\Expense::class) --}}
-            {{-- <button @click="$wire.print().then(open)" type="button"
-                    class="ml-3 inline-flex items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto">
-                Print
-            </button> --}}
-            {{-- @endcan --}}
+            @can('add expense')
+                <button wire:click="$emit('createExpenseType')" type="button"
+                        class="inline-flex items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 sm:w-auto">
+                    Add Expense Type
+                </button>
+            @endcan
         </div>
 
     </x-content-header-section>
@@ -50,15 +36,15 @@
                         <x-td-slim-with-align align="center">{{ $type->id }}</x-td-slim-with-align>
                         <x-td>{{ $type->expense_type_name }}</x-td>
                         <x-td>
-                            {{-- @can('update', $type) --}}
-                            <button type="button" wire:click="$emit('editExpenseType', {{ $type->id }})"
-                                    class="text-primary hover:text-blue-900">Edit</button>
-                            {{-- @endcan --}}
+                            @can('edit expense')
+                                <button type="button" wire:click="$emit('editExpenseType', {{ $type->id }})"
+                                        class="text-primary hover:text-blue-900">Edit</button>
+                            @endcan
 
-                            {{-- @can('delete', $type) --}}
-                            <button type="button" wire:click="$emit('deleteExpenseType', {{ $type->id }})"
-                                    class="ml-3 text-primary hover:text-blue-900">Delete</button>
-                            {{-- @endcan --}}
+                            @can('delete expense')
+                                <button type="button" wire:click="$emit('deleteExpenseType', {{ $type->id }})"
+                                        class="ml-3 text-primary hover:text-blue-900">Delete</button>
+                            @endcan
                         </x-td>
                     </tr>
                 @endforeach

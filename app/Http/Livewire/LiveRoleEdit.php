@@ -4,12 +4,14 @@ namespace App\Http\Livewire;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class LiveRoleEdit extends Component
 {
     public ?Role $role = null;
     public $selectedRolePermissions = [];
+    public $selectGroup;
     public $showRoleEditForm = false;
 
     protected $listeners = ['editRole'];
@@ -35,6 +37,18 @@ class LiveRoleEdit extends Component
         $this->closeShowRoleEditForm();
     }
 
+    public function updated($key, $value)
+    {
+        $explode = Str::of($key)->explode('.');
+        if ($explode[0] === 'selectGroup' && $value) {
+            $permissionIds = Permission::where('group_name', $value)->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+            $this->selectedRolePermissions = array_values(array_unique(array_merge_recursive($this->selectedRolePermissions, $permissionIds)));
+        } elseif ($explode[0] === 'selectGroup' && $value === false) {
+            $permissionIds = Permission::where('group_name', $explode[1])->pluck('id')->map(fn ($id) => (string) $id)->toArray();
+            $this->selectedRolePermissions = array_merge(array_diff($this->selectedRolePermissions, $permissionIds));
+        }
+    }
+
     public function closeShowRoleEditForm()
     {
         $this->showRoleEditForm = false;
@@ -51,7 +65,7 @@ class LiveRoleEdit extends Component
     public function editRole(Role $role)
     {
         $this->role = $role;
-        $this->selectedRolePermissions = $role->permissions->pluck('id');
+        $this->selectedRolePermissions = $role->permissions->pluck('id')->toArray();
         $this->showRoleEditForm = true;
     }
 

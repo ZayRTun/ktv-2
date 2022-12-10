@@ -32,6 +32,8 @@ class Delete extends Component
 
     public function deleteExpenseType(ExpenseType $expenseType)
     {
+        $this->authorize('delete expense');
+
         $this->expenseType = $expenseType;
         $this->showExpenseTypeDeleteModal = true;
     }

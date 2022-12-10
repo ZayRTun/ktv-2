@@ -14,7 +14,12 @@ class LiveUserRolesAndPermissionView extends Component
     public $selectedRole;
     public $selectedRolePermissions = [];
 
-    protected $listeners = ['roleCreated' => '$refresh', 'roleUpdated' => '$refresh'];
+    protected $listeners = ['roleCreated', 'roleUpdated' => '$refresh'];
+
+    public function roleCreated()
+    {
+        $this->roles = Role::with('permissions')->get();
+    }
 
     public function mount()
     {

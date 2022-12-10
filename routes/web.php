@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/expenses', LiveExpenseIndex::class)->name('expense.index')->middleware('permission:view expenses');
-    Route::get('/expenses/types', ExpenseType\Index::class)->name('expense.type.index');
+    Route::get('/expenses/types', ExpenseType\Index::class)->name('expense.type.index')->middleware('permission:view expenses');
 
 
     Route::group(['middleware' => ['permission:view any users']], function () {
