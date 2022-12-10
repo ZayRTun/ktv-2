@@ -26,7 +26,7 @@
              class="flex items-end sm:items-center justify-center min-h-full p-4 text-center sm:p-0">
             @isset($role)
                 <div
-                     class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 max-w-4xl w-full">
+                     class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 max-w-6xl w-full">
                     <div class="bg-white shadow overflow-hidden sm:rounded-lg ">
 
                         <div class="bg-primary flex items-center justify-between px-6 py-4 text-white">
@@ -47,10 +47,14 @@
                                             <div class="col-span-6">
                                                 <header class="font-medium text-gray-700">Assign Permissions to Role</header>
 
-                                                <div class="bg-white grid grid-cols-4 gap-10 mt-3">
+                                                <div class="bg-white grid grid-cols-5 gap-8 mt-3">
                                                     @foreach ($permissionGroups as $key => $permissions)
                                                         <div class="col-span-1">
-                                                            <header>{{ ucwords(Str::replace('_', ' ', $key)) }}</header>
+                                                            <x-inline-checkbox-with-bold-label wire:model="selectGroup.{{ $key }}"
+                                                                                               value="{{ $key }}"
+                                                                                               label="{{ ucwords($key) }}"
+                                                                                               for="{{ $key }}"
+                                                                                               isDisabled="{{ false }}" />
                                                             <ul class="mt-1">
                                                                 @foreach ($permissions as $permission)
                                                                     <li class="mb-1"

@@ -3,10 +3,13 @@
 namespace App\Http\Livewire\ExpenseType;
 
 use App\Models\ExpenseType;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
 class Edit extends Component
 {
+    use AuthorizesRequests;
+
     public $expenseType;
     public $showExpenseTypeEditForm = false;
 
@@ -30,6 +33,7 @@ class Edit extends Component
 
     public function editExpenseType(ExpenseType $expenseType)
     {
+		$this->authorize('edit expense');
         $this->resetValidation();
         $this->reset();
         $this->expenseType = $expenseType;

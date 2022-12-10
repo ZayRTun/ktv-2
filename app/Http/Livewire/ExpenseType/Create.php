@@ -3,10 +3,13 @@
 namespace App\Http\Livewire\ExpenseType;
 
 use App\Models\ExpenseType;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Livewire\Component;
 
 class Create extends Component
 {
+    use AuthorizesRequests;
+
     public $expenseType;
     public $showExpenseTypeCreateForm = false;
 
@@ -30,6 +33,8 @@ class Create extends Component
 
     public function createExpenseType()
     {
+        $this->authorize('add expense');
+
         $this->resetValidation();
         $this->reset();
         $this->expenseType = new ExpenseType();
