@@ -470,7 +470,8 @@ class LiveInhouseEdit extends Component
 
         $this->inhouse = $inhouse->load('room.type');
 
-        if (!$inhouse->departure) {
+
+        if (!$inhouse->checkout_payment_done) {
             $this->setSessionAndDeparture();
         }
 
