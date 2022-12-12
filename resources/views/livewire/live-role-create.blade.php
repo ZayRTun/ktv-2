@@ -47,7 +47,7 @@
                                             <div class="col-span-6">
                                                 <header class="font-medium text-gray-700">Assign Permissions to Role</header>
 
-                                                <div class="bg-white grid grid-cols-5 gap-8 mt-3">
+                                                <div class="bg-white grid grid-cols-5 gap-5 mt-3">
                                                     @foreach ($permissionGroups as $key => $permissions)
                                                         <div class="col-span-1">
                                                             <x-inline-checkbox-with-bold-label wire:model="selectGroup.{{ $key }}"

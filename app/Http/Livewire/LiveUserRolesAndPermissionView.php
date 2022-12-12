@@ -14,9 +14,9 @@ class LiveUserRolesAndPermissionView extends Component
     public $selectedRole;
     public $selectedRolePermissions = [];
 
-    protected $listeners = ['roleCreated', 'roleUpdated' => '$refresh'];
+    protected $listeners = ['reloadRoles'];
 
-    public function roleCreated()
+    public function reloadRoles()
     {
         $this->roles = Role::with('permissions')->get();
     }
@@ -30,7 +30,16 @@ class LiveUserRolesAndPermissionView extends Component
 
     public function render()
     {
-        $this->selectedRolePermissions = $this->roles->where('id', $this->selectedRole)->first()->permissions->pluck('id');
+        $selectedRole = $this->roles->where('id', $this->selectedRole)->first();
+        if ($selectedRole) {
+            $this->selectedRolePermissions = $selectedRole->permissions->pluck('id');
+        } else {
+            $this->roles = Role::with('permissions')->get();
+            $this->selectedRole = $this->roles->first()->id;
+            $selectedRole = $this->roles->where('id', $this->selectedRole)->first();
+            $this->selectedRolePermissions = $selectedRole->permissions->pluck('id');
+        }
+
         return view('livewire.live-user-roles-and-permission-view', [
             'permissionGroups' => Permission::all()->groupBy('group_name')
         ]);
