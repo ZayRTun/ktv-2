@@ -17,9 +17,7 @@ return new class () extends Migration {
             $table->date('operation_date');
             $table->foreignId('inhouse_id');
             $table->foreignId('transaction_id');
-            // $table->string('currency_code');
-            $table->float('amount');
-            // $table->string('payment');
+            $table->bigInteger('amount');
             $table->string('remark')->nullable();
             $table->integer('created_user_id');
             $table->integer('updated_user_id')->nullable();

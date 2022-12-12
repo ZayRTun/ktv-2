@@ -19,10 +19,10 @@ return new class () extends Migration {
             $table->unsignedBigInteger('invoice_no')->nullable();
             $table->foreignId('supplier_id')->nullable();
             $table->date('due_date')->nullable();
-            $table->float('total')->default(0);
+            $table->bigInteger('total')->default(0);
             $table->float('discount')->default(0);
             $table->float('tax')->default(0);
-            $table->float('amount')->default(0);
+            $table->bigInteger('amount')->default(0);
             $table->foreignId('payment_type_id');
             $table->boolean('is_paid')->default(false);
             $table->unsignedInteger('created_user_id');

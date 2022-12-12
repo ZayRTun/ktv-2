@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->date('expense_date');
             $table->foreignId('expense_type_id')->constrained()->restrictOnDelete();
             $table->string('description')->nullable();
-            $table->float('price');
+            $table->bigInteger('price');
             $table->float('qty')->nullable();
             $table->unsignedInteger('created_user_id');
             $table->unsignedInteger('updated_user_id')->nullable();

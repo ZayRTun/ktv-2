@@ -22,12 +22,12 @@ return new class () extends Migration {
             $table->boolean('checkout_payment_done')->default(false);
             $table->boolean('checked_out')->default(false);
             $table->string('customer_id')->nullable();
-            $table->float('sub_total')->default(0);
+            $table->total('sub_total')->default(0);
             $table->float('commercial_tax')->default(0);
             $table->float('commercial_tax_amount')->default(0);
             $table->float('service_tax')->default(0);
             $table->float('service_tax_amount')->default(0);
-            $table->float('total')->default(0);
+            $table->total('total')->default(0);
             $table->float('payment_type_id')->default(1);
             $table->string('room_transfer_reason')->nullable();
             $table->string('remark')->nullable();
