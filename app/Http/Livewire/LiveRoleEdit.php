@@ -4,11 +4,14 @@ namespace App\Http\Livewire;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
 class LiveRoleEdit extends Component
 {
+    use AuthorizesRequests;
+
     public ?Role $role = null;
     public $selectedRolePermissions = [];
     public $selectGroup;
@@ -29,11 +32,9 @@ class LiveRoleEdit extends Component
 
         $this->role->update();
 
-        if ($this->selectedRolePermissions) {
-            $this->role->syncPermissions($this->selectedRolePermissions);
-        }
+        $this->role->syncPermissions($this->selectedRolePermissions);
 
-        $this->emit('roleUpdated');
+        $this->emit('reloadRoles');
         $this->closeShowRoleEditForm();
     }
 
@@ -64,6 +65,7 @@ class LiveRoleEdit extends Component
 
     public function editRole(Role $role)
     {
+        $this->authorize('edit role');
         $this->role = $role;
         $this->selectedRolePermissions = $role->permissions->pluck('id')->toArray();
         $this->showRoleEditForm = true;

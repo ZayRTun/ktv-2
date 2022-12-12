@@ -4,11 +4,14 @@ namespace App\Http\Livewire;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
 class LiveRoleCreate extends Component
 {
+    use AuthorizesRequests;
+
     public ?Role $role = null;
     public $selectedRolePermissions = [];
     public $selectGroup;
@@ -26,9 +29,7 @@ class LiveRoleCreate extends Component
 
         $this->role->save();
 
-        if ($this->selectedRolePermissions) {
-            $this->role->syncPermissions($this->selectedRolePermissions);
-        }
+        $this->role->syncPermissions($this->selectedRolePermissions);
 
         $this->emit('roleCreated');
         $this->closeShowRoleCreateForm();
@@ -61,6 +62,8 @@ class LiveRoleCreate extends Component
 
     public function createRole()
     {
+        $this->authorize('add role');
+
         $this->role = new Role();
         $this->showRoleCreateForm = true;
     }
